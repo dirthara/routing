@@ -32,6 +32,38 @@ final class RoutePatternTest extends TestCase
         yield 'slug with a trailing dash' => [RoutePattern::Slug, 'hello-', false];
         yield 'slug with a double dash' => [RoutePattern::Slug, 'hello--world', false];
         yield 'uppercase slug' => [RoutePattern::Slug, 'Hello', false];
+        yield 'positive integer' => [RoutePattern::PositiveInteger, '42', true];
+        yield 'positive integer of one digit' => [RoutePattern::PositiveInteger, '7', true];
+        yield 'zero' => [RoutePattern::PositiveInteger, '0', false];
+        yield 'positive integer with a leading zero' => [RoutePattern::PositiveInteger, '007', false];
+        yield 'alpha' => [RoutePattern::Alpha, 'FAQ', true];
+        yield 'alpha with a digit' => [RoutePattern::Alpha, 'faq2', false];
+        yield 'alpha with a non-ASCII letter' => [RoutePattern::Alpha, 'jörg', false];
+        yield 'alphanumeric' => [RoutePattern::Alphanumeric, 'abc123XYZ', true];
+        yield 'alphanumeric with a dash' => [RoutePattern::Alphanumeric, 'abc-123', false];
+        yield 'hex' => [RoutePattern::Hex, 'DeadBeef0123', true];
+        yield 'hex with a non-hex letter' => [RoutePattern::Hex, 'deadbeeg', false];
+        yield 'ulid' => [RoutePattern::Ulid, '01ARZ3NDEKTSV4RRFFQ69G5FAV', true];
+        yield 'lowercase ulid' => [RoutePattern::Ulid, '01arz3ndektsv4rrffq69g5fav', true];
+        yield 'largest ulid' => [RoutePattern::Ulid, '7ZZZZZZZZZZZZZZZZZZZZZZZZZ', true];
+        yield 'ulid beyond the timestamp' => [RoutePattern::Ulid, '8ZZZZZZZZZZZZZZZZZZZZZZZZZ', false];
+        yield 'ulid with an excluded letter' => [RoutePattern::Ulid, '01ARZ3NDEKTSV4RRFFQ69G5FAI', false];
+        yield 'ulid of 25 characters' => [RoutePattern::Ulid, '01ARZ3NDEKTSV4RRFFQ69G5FA', false];
+        yield 'date' => [RoutePattern::Date, '2026-09-24', true];
+        yield 'last day of a month' => [RoutePattern::Date, '2026-12-31', true];
+        yield 'impossible day in a possible range' => [RoutePattern::Date, '2026-02-31', true];
+        yield 'thirteenth month' => [RoutePattern::Date, '2026-13-01', false];
+        yield 'day zero' => [RoutePattern::Date, '2026-01-00', false];
+        yield 'thirty-second day' => [RoutePattern::Date, '2026-01-32', false];
+        yield 'date without padding' => [RoutePattern::Date, '2026-9-24', false];
+        yield 'year' => [RoutePattern::Year, '2026', true];
+        yield 'two-digit year' => [RoutePattern::Year, '26', false];
+        yield 'five-digit year' => [RoutePattern::Year, '20260', false];
+        yield 'language' => [RoutePattern::Locale, 'en', true];
+        yield 'language and region' => [RoutePattern::Locale, 'en-US', true];
+        yield 'lowercase region' => [RoutePattern::Locale, 'en-us', false];
+        yield 'underscore locale' => [RoutePattern::Locale, 'en_US', false];
+        yield 'script subtag' => [RoutePattern::Locale, 'zh-Hant-TW', false];
     }
 
     #[Test]

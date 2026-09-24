@@ -273,4 +273,28 @@ final class RouteTest extends TestCase
         self::assertSame(['id' => 'jane'], $route->matches('/users/jane'));
         self::assertSame(['id' => '[^/]+'], $route->constraints());
     }
+
+    #[Test]
+    public function it_keeps_the_alternatives_of_a_pattern_inside_its_parameter(): void
+    {
+        $route = new Route(HttpMethod::Get, '/{locale}/archive/{date}', 'handler')->whereMany([
+            'locale' => RoutePattern::Locale,
+            'date' => RoutePattern::Date,
+        ]);
+
+        self::assertSame(['locale' => 'en-US', 'date' => '2026-09-24'], $route->matches('/en-US/archive/2026-09-24'));
+        self::assertSame(['locale' => 'nl', 'date' => '2026-12-31'], $route->matches('/nl/archive/2026-12-31'));
+        self::assertNull($route->matches('/en/archive/2026-12-310'));
+        self::assertNull($route->matches('/en/archive/x2026-01-01'));
+    }
+
+    #[Test]
+    public function it_accepts_every_route_pattern_as_a_constraint(): void
+    {
+        $route = new Route(HttpMethod::Get, '/{value}', 'handler');
+
+        foreach (RoutePattern::cases() as $pattern) {
+            self::assertSame(['value' => $pattern->value], $route->where('value', $pattern)->constraints());
+        }
+    }
 }

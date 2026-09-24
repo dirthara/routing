@@ -100,9 +100,26 @@ so far, keyed by parameter name, including one set back to the default.
 | `RoutePattern` case | Pattern | Matches |
 | --- | --- | --- |
 | `Segment` | `[^/]+` | One or more characters other than `/`: a whole path segment. This is the default. |
-| `Integer` | `\d+` | One or more digits, such as `42`. No sign. |
+| `Integer` | `\d+` | One or more digits, such as `42`. No sign, but leading zeros and `0` are accepted. |
+| `PositiveInteger` | `[1-9]\d*` | A whole number from 1 up without leading zeros, such as `42`. Use it for IDs and page numbers, so `/users/7` and `/users/007` are not two URLs for the same page. |
+| `Alpha` | `[A-Za-z]+` | ASCII letters, such as `FAQ`. |
+| `Alphanumeric` | `[A-Za-z0-9]+` | ASCII letters and digits, such as `abc123`. |
+| `Hex` | `[0-9a-fA-F]+` | Hexadecimal digits in either case, such as a hash or a commit SHA. |
 | `Uuid` | `[0-9a-fA-F]{8}-…-[0-9a-fA-F]{12}` | A UUID in its 8-4-4-4-12 form, in either case. |
+| `Ulid` | `[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}` | A ULID: 26 Crockford base32 characters in either case, starting with `0` to `7`. |
 | `Slug` | `[a-z0-9]+(?:-[a-z0-9]+)*` | Lowercase words joined by single dashes, such as `hello-world`. |
+| `Date` | `\d{4}-(?:0[1-9]\|1[0-2])-(?:…)` | A date in `YYYY-MM-DD` form with a month from 01 to 12 and a day from 01 to 31, such as `2026-09-24`. |
+| `Year` | `\d{4}` | Four digits, such as `2026`. |
+| `Locale` | `[a-z]{2}(?:-[A-Z]{2})?` | A language, optionally with a region, such as `en` or `en-US`. |
+
+:::caution
+`Date` checks the form and the ranges, not the calendar: `2026-02-31` matches. Parse the value in the handler and treat
+a date that does not exist as not found. `Locale` covers two-letter languages and regions only, so a tag such as
+`zh-Hant-TW` or `es-419` does not match; write your own pattern if you need those.
+:::
+
+The letter and digit classes are ASCII only. Parameters are matched in their encoded form, so a letter such as `ö`
+arrives as `%C3%B6` and never matches `Alpha`.
 
 A constraint for a parameter the path does not have, or a pattern that is not a valid regular expression, throws an
 `InvalidRouteException`. Patterns are delimited with `~` internally, so a pattern that contains `~` is rejected as
