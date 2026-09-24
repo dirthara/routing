@@ -10,7 +10,7 @@
          displayDetailsOnTestsThatTriggerWarnings="true"
          displayDetailsOnTestsThatTriggerErrors="true">
     <testsuites>
-        <testsuite name="Dirthara __NAMESPACE__">
+        <testsuite name="Dirthara Routing">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

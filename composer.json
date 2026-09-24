@@ -1,23 +1,23 @@
 {
-    "name": "dirthara/__PACKAGE__",
-    "description": "__DESCRIPTION__",
+    "name": "dirthara/routing",
+    "description": "Routing for the Dirthara Framework",
     "type": "library",
     "homepage": "https://dirthara.github.io/docs/",
     "require": {
         "php": "^8.5"
     },
     "require-dev": {
-        "phpunit/phpunit": "^12.0"
+        "phpunit/phpunit": "^13.0"
     },
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Dirthara\\__NAMESPACE__\\": "src/"
+            "Dirthara\\Routing\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Dirthara\\__NAMESPACE__\\Tests\\": "tests/"
+            "Dirthara\\Routing\\Tests\\": "tests/"
         }
     },
     "authors": [
@@ -27,8 +27,8 @@
     ],
     "support": {
         "docs": "https://dirthara.github.io/docs/",
-        "issues": "https://github.com/dirthara/__PACKAGE__/issues",
-        "source": "https://github.com/dirthara/__PACKAGE__"
+        "issues": "https://github.com/dirthara/routing/issues",
+        "source": "https://github.com/dirthara/routing"
     },
     "prefer-stable": true,
     "config": {

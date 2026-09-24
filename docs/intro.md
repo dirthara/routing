@@ -1,11 +1,11 @@
 ---
 id: intro
-title: Dirthara __NAMESPACE__
+title: Dirthara Routing
 sidebar_position: 1
-description: Status and scope of the Dirthara __NAMESPACE__ package.
+description: Status and scope of the Dirthara Routing package.
 ---
 
-__DESCRIPTION__.
+Routing for the Dirthara Framework.
 
 :::note
 The package is an initial scaffold. There is no public API or published

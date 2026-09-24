@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 $script = dirname(__DIR__) . '/sort-imports.php';
-$file = tempnam(sys_get_temp_dir(), '__PACKAGE__-imports-');
+$file = tempnam(sys_get_temp_dir(), 'routing-imports-');
 
 if ($file === false) {
     throw new RuntimeException('Unable to create temporary fixture.');
