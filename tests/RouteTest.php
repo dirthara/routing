@@ -260,4 +260,17 @@ final class RouteTest extends TestCase
 
         $route->generatePath(['page' => 'last']);
     }
+
+    #[Test]
+    public function it_resets_a_constraint_to_the_default_segment_pattern(): void
+    {
+        $route = new Route(HttpMethod::Get, '/users/{id}', 'handler')->where('id', RoutePattern::Integer);
+
+        self::assertNull($route->matches('/users/jane'));
+
+        $route->where('id', RoutePattern::Segment);
+
+        self::assertSame(['id' => 'jane'], $route->matches('/users/jane'));
+        self::assertSame(['id' => '[^/]+'], $route->constraints());
+    }
 }

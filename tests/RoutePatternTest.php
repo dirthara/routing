@@ -18,6 +18,9 @@ final class RoutePatternTest extends TestCase
      */
     public static function values(): iterable
     {
+        yield 'segment' => [RoutePattern::Segment, 'jörg doe.pdf', true];
+        yield 'empty segment' => [RoutePattern::Segment, '', false];
+        yield 'two segments' => [RoutePattern::Segment, 'a/b', false];
         yield 'integer' => [RoutePattern::Integer, '42', true];
         yield 'integer with letters' => [RoutePattern::Integer, '4a', false];
         yield 'negative integer' => [RoutePattern::Integer, '-4', false];

@@ -45,8 +45,9 @@ characters long, and appears once per path. A path that breaks these rules, has 
 does not start with `/` throws an `InvalidRouteException` when it is registered.
 
 :::note
-Without a constraint, a parameter matches one path segment: one or more characters other than `/`. In
-`/files/{name}.{format}`, that means `{name}` can also swallow dots; constrain it if the split matters.
+Without a constraint, a parameter matches one path segment: one or more characters other than `/`, the pattern of
+`RoutePattern::Segment`. In `/files/{name}.{format}`, that means `{name}` can also swallow dots; constrain it if the
+split matters.
 :::
 
 ## Optional parameters
@@ -92,11 +93,13 @@ $router->get('/reports/{year}/{format}', ShowReport::class)->whereMany([
 With those routes, `/users/42` matches `ShowUser` and `/users/jane` falls through to `ShowUserByName`.
 
 The pattern always has to match the whole parameter, so write it without `^`, `$`, or delimiters; `csv|json` matches
-`csv` or `json` and nothing longer. Setting a constraint again replaces the earlier one. `constraints()` returns the
-constraints set so far, keyed by parameter name.
+`csv` or `json` and nothing longer. Setting a constraint again replaces the earlier one, so
+`->where('id', RoutePattern::Segment)` puts a parameter back to the default. `constraints()` returns the constraints set
+so far, keyed by parameter name, including one set back to the default.
 
 | `RoutePattern` case | Pattern | Matches |
 | --- | --- | --- |
+| `Segment` | `[^/]+` | One or more characters other than `/`: a whole path segment. This is the default. |
 | `Integer` | `\d+` | One or more digits, such as `42`. No sign. |
 | `Uuid` | `[0-9a-fA-F]{8}-…-[0-9a-fA-F]{12}` | A UUID in its 8-4-4-4-12 form, in either case. |
 | `Slug` | `[a-z0-9]+(?:-[a-z0-9]+)*` | Lowercase words joined by single dashes, such as `hello-world`. |

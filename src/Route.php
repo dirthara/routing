@@ -21,8 +21,6 @@ use function restore_error_handler;
 
 final class Route
 {
-    private const string DEFAULT_PATTERN = '[^/]+';
-
     public private(set) string|UnitEnum|null $name = null;
 
     /**
@@ -188,7 +186,7 @@ final class Route
         $patterns = [];
 
         foreach ($this->routePath->parameters() as $parameter) {
-            $patterns[$parameter] = $this->constraints[$parameter] ?? self::DEFAULT_PATTERN;
+            $patterns[$parameter] = $this->constraints[$parameter] ?? RoutePattern::Segment->value;
         }
 
         return $patterns;
