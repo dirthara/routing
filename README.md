@@ -4,9 +4,9 @@
 
 # Dirthara Routing
 
-Routing for the Dirthara Framework. This repository is the initial package scaffold; no public API or release is available yet. Usage 
-documentation lives in [`docs`](docs/intro.md) and is published on the Dirthara documentation site at 
-<https://dirthara.github.io/docs/>, which documents every package in the framework.
+Routing for the Dirthara Framework: match an HTTP method and path to a handler, and generate paths for named routes. No 
+release is available yet. Usage documentation lives in [`docs`](docs/intro.md) and is published on the Dirthara 
+documentation site at <https://dirthara.github.io/docs/>, which documents every package in the framework.
 
 ## Installation
 
@@ -46,10 +46,6 @@ docker compose exec php composer test
 ```
 
 Tests belong in `tests`, under `Dirthara\Routing\Tests`. Source belongs in`src`, under `Dirthara\Routing`.
-
-The initial scaffold has no PHP source or tests. Test and coverage commands explicitly report that checks are not 
-applicable while both directories contain no PHP files. As soon as either contains PHP files, PHPUnit and the coverage
-gate run normally; an empty test suite fails.
 
 ## Code quality
 

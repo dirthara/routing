@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dirthara\Routing;
 
 enum HttpMethod: string
