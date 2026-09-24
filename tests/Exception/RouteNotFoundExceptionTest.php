@@ -6,10 +6,15 @@ namespace Dirthara\Routing\Tests\Exception;
 
 use RuntimeException;
 use PHPUnit\Framework\TestCase;
+use Dirthara\Routing\HttpMethod;
 use PHPUnit\Framework\Attributes\Test;
 use Dirthara\Routing\Tests\Fixtures\RouteName;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Dirthara\Routing\Exception\RoutingException;
+use Dirthara\Routing\Tests\Fixtures\UserController;
 use Dirthara\Routing\Exception\RouteNotFoundException;
+
+use function sprintf;
 
 final class RouteNotFoundExceptionTest extends TestCase
 {
@@ -63,5 +68,41 @@ final class RouteNotFoundExceptionTest extends TestCase
 
         self::assertSame('No route is named "' . RouteName::class . '::UsersShow".', $exception->getMessage());
         self::assertSame(['name' => RouteName::UsersShow], $exception->context);
+    }
+
+    /**
+     * @return iterable<string, array{mixed, string}>
+     */
+    public static function actions(): iterable
+    {
+        yield 'class name' => ['App\\ShowUser', 'App\\ShowUser'];
+        yield 'control characters' => ["Show\nUser", 'Show\\nUser'];
+        yield 'class and method' => [[UserController::class, 'show'], UserController::class . '::show'];
+        yield 'object and method' => [[new UserController(), 'show'], UserController::class . '::show'];
+        yield 'non-string target' => [[1, 'show'], 'int::show'];
+        yield 'closure' => [static fn(): string => 'response', 'Closure'];
+        yield 'object' => [new UserController(), UserController::class];
+        yield 'integer' => [42, 'int'];
+        yield 'array of three' => [['a', 'b', 'c'], 'array'];
+        yield 'array without a method name' => [['a', 5], 'array'];
+    }
+
+    #[Test]
+    #[DataProvider('actions')]
+    public function it_describes_an_action_without_a_route(mixed $action, string $description): void
+    {
+        $exception = RouteNotFoundException::forAction($action);
+
+        self::assertSame(sprintf('No route has the action "%s".', $description), $exception->getMessage());
+        self::assertSame(['action' => $action, 'method' => null], $exception->context);
+    }
+
+    #[Test]
+    public function it_describes_an_action_without_a_route_for_a_method(): void
+    {
+        $exception = RouteNotFoundException::forAction('ListUsers', HttpMethod::Delete);
+
+        self::assertSame('No DELETE route has the action "ListUsers".', $exception->getMessage());
+        self::assertSame(['action' => 'ListUsers', 'method' => 'DELETE'], $exception->context);
     }
 }

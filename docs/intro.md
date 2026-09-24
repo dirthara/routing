@@ -25,7 +25,8 @@ $match = $router->match(HttpMethod::Get, '/users/42');
 $match->handler();    // ShowUser::class
 $match->parameters;   // ['id' => '42']
 
-$router->url('users.show', ['id' => 42]);   // '/users/42'
+$router->url('users.show', ['id' => 42]);         // '/users/42'
+$router->urls()->action(CreateUser::class);        // '/users'
 ```
 
 The router does not call the handler. A handler is any value you choose, such as a class name, a closure, or an array,
@@ -36,6 +37,7 @@ and `match()` hands it back with the parameters so your application can dispatch
 | `Router` | The registered routes, and the entry point for matching paths and generating URLs. |
 | `Route` | One method, path, and handler, with an optional name and parameter constraints. |
 | `RouteMatch` | The result of a successful match: the route and its decoded parameters. |
+| `UrlGenerator` | Builds the path of a route from its name or its action. |
 | `RouteCollection` | The routes in the order they were registered. |
 | `HttpMethod` | The methods a route can be registered for. |
 | `RoutePattern` | Ready-made constraints for integers, UUIDs, and slugs. |

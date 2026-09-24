@@ -7,8 +7,11 @@ namespace Dirthara\Routing\Exception;
 use UnitEnum;
 use Throwable;
 use InvalidArgumentException;
+use Dirthara\Routing\HttpMethod;
 
+use function implode;
 use function sprintf;
+use function array_map;
 
 final class InvalidRouteException extends InvalidArgumentException implements RoutingException
 {
@@ -124,6 +127,23 @@ final class InvalidRouteException extends InvalidArgumentException implements Ro
                 self::printable($secondPath),
             ),
             context: ['name' => $name, 'paths' => [$firstPath, $secondPath]],
+        );
+    }
+
+    /**
+     * @param list<string> $routes
+     */
+    public static function ambiguousAction(mixed $action, ?HttpMethod $method, array $routes): self
+    {
+        return new self(
+            message: sprintf(
+                'The action "%s" is the handler of more than one %sroute: %s.%s',
+                self::printableAction($action),
+                $method === null ? '' : $method->value . ' ',
+                implode(', ', array_map(self::printable(...), $routes)),
+                $method === null ? ' Pass a method to choose one.' : '',
+            ),
+            context: ['action' => $action, 'method' => $method?->value, 'routes' => $routes],
         );
     }
 }

@@ -391,4 +391,26 @@ final class RouterTest extends TestCase
         self::assertSame('/posts/2', $router->url('posts.index', ['page' => 2]));
         self::assertSame('/', $router->url('home'));
     }
+
+    #[Test]
+    public function it_shares_its_url_generator(): void
+    {
+        $router = new Router();
+        $router->get('/users/{id}', 'ShowUser')->name('users.show');
+
+        self::assertSame($router->urls(), $router->urls());
+        self::assertSame('/users/7', $router->urls()->action('ShowUser', ['id' => 7]));
+        self::assertSame('/users/7', $router->urls()->name('users.show', ['id' => 7]));
+    }
+
+    #[Test]
+    public function it_generates_urls_for_routes_added_after_the_generator_was_taken(): void
+    {
+        $router = new Router();
+        $urls = $router->urls();
+
+        $router->get('/users', 'ListUsers');
+
+        self::assertSame('/users', $urls->action('ListUsers'));
+    }
 }

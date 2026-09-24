@@ -7,8 +7,10 @@ namespace Dirthara\Routing\Tests\Exception;
 use RuntimeException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Dirthara\Routing\HttpMethod;
 use PHPUnit\Framework\Attributes\Test;
 use Dirthara\Routing\Exception\RoutingException;
+use Dirthara\Routing\Tests\Fixtures\UserController;
 use Dirthara\Routing\Exception\InvalidRouteException;
 
 final class InvalidRouteExceptionTest extends TestCase
@@ -82,5 +84,30 @@ final class InvalidRouteExceptionTest extends TestCase
             $exception->getMessage(),
         );
         self::assertSame(['path' => "/{lang?}/about\n", 'parameter' => 'lang'], $exception->context);
+    }
+
+    #[Test]
+    public function it_describes_an_ambiguous_action(): void
+    {
+        $exception = InvalidRouteException::ambiguousAction(
+            [UserController::class, 'show'],
+            HttpMethod::Get,
+            ["GET /users/{id}\n", 'GET /people/{id}'],
+        );
+
+        self::assertSame(
+            'The action "'
+            . UserController::class
+            . '::show" is the handler of more than one GET route: GET /users/{id}\\n, GET /people/{id}.',
+            $exception->getMessage(),
+        );
+        self::assertSame(
+            [
+                'action' => [UserController::class, 'show'],
+                'method' => 'GET',
+                'routes' => ["GET /users/{id}\n", 'GET /people/{id}'],
+            ],
+            $exception->context,
+        );
     }
 }

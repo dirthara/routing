@@ -79,4 +79,39 @@ final class RouteCollectionTest extends TestCase
             self::assertSame(['name' => RouteName::UsersIndex, 'paths' => ['/users', '/people']], $exception->context);
         }
     }
+
+    #[Test]
+    public function it_finds_a_route_by_its_action(): void
+    {
+        $collection = new RouteCollection();
+        $index = new Route(HttpMethod::Get, '/users', 'ListUsers');
+        $store = new Route(HttpMethod::Post, '/users', 'StoreUser');
+        $collection->add($index);
+        $collection->add($store);
+
+        self::assertSame($index, $collection->handledBy('ListUsers'));
+        self::assertSame($store, $collection->handledBy('StoreUser', HttpMethod::Post));
+        self::assertNull($collection->handledBy('StoreUser', HttpMethod::Get));
+        self::assertNull($collection->handledBy('ShowUser'));
+    }
+
+    #[Test]
+    public function it_rejects_an_action_shared_by_routes_it_cannot_tell_apart(): void
+    {
+        $collection = new RouteCollection();
+        $collection->add(new Route(HttpMethod::Get, '/users', 'Users'));
+        $collection->add(new Route(HttpMethod::Post, '/users', 'Users'));
+
+        self::assertSame(HttpMethod::Post, $collection->handledBy('Users', HttpMethod::Post)?->method);
+
+        try {
+            $collection->handledBy('Users');
+            self::fail('Expected an InvalidRouteException.');
+        } catch (InvalidRouteException $exception) {
+            self::assertSame(
+                ['action' => 'Users', 'method' => null, 'routes' => ['GET /users', 'POST /users']],
+                $exception->context,
+            );
+        }
+    }
 }

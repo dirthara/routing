@@ -26,9 +26,9 @@ try {
 
 | Exception | Extends | Thrown for |
 | --- | --- | --- |
-| `RouteNotFoundException` | `RuntimeException` | A path no route matches, and a name no route has. |
+| `RouteNotFoundException` | `RuntimeException` | A path no route matches, and a name or action no route has. |
 | `MethodNotAllowedException` | `RuntimeException` | A path that has routes, but none for the request method. |
-| `InvalidRouteException` | `InvalidArgumentException` | Invalid paths, names, and constraints, and a name given to more than one route. |
+| `InvalidRouteException` | `InvalidArgumentException` | Invalid paths, names, and constraints, and a name or action that more than one route has. |
 | `InvalidUrlParameterException` | `InvalidArgumentException` | Missing, unknown, or non-matching parameters when generating a URL. |
 
 All exception classes are `final`; catch them by class or by `RoutingException`.

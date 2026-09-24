@@ -17,10 +17,13 @@ final readonly class Router
 {
     private RouteCollection $routes;
 
+    private UrlGenerator $urls;
+
     public function __construct(
         public TrailingSlash $trailingSlash = TrailingSlash::Ignore,
     ) {
         $this->routes = new RouteCollection();
+        $this->urls = new UrlGenerator($this->routes);
     }
 
     /**
@@ -141,8 +144,11 @@ final readonly class Router
      */
     public function url(string|UnitEnum $name, array $parameters = []): string
     {
-        $route = $this->routes->named($name) ?? throw RouteNotFoundException::forName($name);
+        return $this->urls->name($name, $parameters);
+    }
 
-        return $route->generatePath($parameters);
+    public function urls(): UrlGenerator
+    {
+        return $this->urls;
     }
 }

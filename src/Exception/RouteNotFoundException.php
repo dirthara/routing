@@ -7,6 +7,7 @@ namespace Dirthara\Routing\Exception;
 use UnitEnum;
 use Throwable;
 use RuntimeException;
+use Dirthara\Routing\HttpMethod;
 
 use function sprintf;
 
@@ -37,5 +38,15 @@ final class RouteNotFoundException extends RuntimeException implements RoutingEx
         return new self(message: sprintf('No route is named "%s".', self::printableName($name)), context: [
             'name' => $name,
         ]);
+    }
+
+    public static function forAction(mixed $action, ?HttpMethod $method = null): self
+    {
+        return new self(
+            message: $method === null
+                ? sprintf('No route has the action "%s".', self::printableAction($action))
+                : sprintf('No %s route has the action "%s".', $method->value, self::printableAction($action)),
+            context: ['action' => $action, 'method' => $method?->value],
+        );
     }
 }
