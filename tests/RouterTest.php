@@ -328,4 +328,67 @@ final class RouterTest extends TestCase
 
         $router->url('users.show', ['id' => 'jane']);
     }
+
+    #[Test]
+    public function it_matches_a_route_with_or_without_its_optional_parameter(): void
+    {
+        $router = new Router();
+        $route = $router->get('/posts/{page?}', 'posts.index')->where('page', RoutePattern::Integer);
+
+        self::assertSame([], $router->match(HttpMethod::Get, '/posts')->parameters);
+        self::assertSame([], $router->match(HttpMethod::Get, '/posts/')->parameters);
+        self::assertSame(['page' => '2'], $router->match(HttpMethod::Get, '/posts/2')->parameters);
+        self::assertSame(['page' => '2'], $router->match(HttpMethod::Get, '/posts/2/')->parameters);
+        self::assertSame($route, $router->match(HttpMethod::Get, '/posts')->route);
+    }
+
+    #[Test]
+    public function it_does_not_match_an_optional_parameter_that_breaks_its_constraint(): void
+    {
+        $router = new Router();
+        $router->get('/posts/{page?}', 'posts.index')->where('page', RoutePattern::Integer);
+
+        $this->expectException(RouteNotFoundException::class);
+
+        $router->match(HttpMethod::Get, '/posts/last');
+    }
+
+    #[Test]
+    public function it_matches_an_optional_parameter_strictly(): void
+    {
+        $router = new Router(TrailingSlash::Strict);
+        $route = $router->get('/posts/{page?}', 'posts.index');
+
+        self::assertSame($route, $router->match(HttpMethod::Get, '/posts')->route);
+        self::assertSame(['page' => '2'], $router->match(HttpMethod::Get, '/posts/2')->parameters);
+
+        $this->expectException(RouteNotFoundException::class);
+
+        $router->match(HttpMethod::Get, '/posts/');
+    }
+
+    #[Test]
+    public function it_matches_an_optional_parameter_at_the_root(): void
+    {
+        foreach ([TrailingSlash::Ignore, TrailingSlash::Strict] as $trailingSlash) {
+            $router = new Router($trailingSlash);
+            $router->get('/{page?}', 'home');
+
+            self::assertSame([], $router->match(HttpMethod::Get, '/')->parameters);
+            self::assertSame([], $router->match(HttpMethod::Get, '')->parameters);
+            self::assertSame(['page' => '2'], $router->match(HttpMethod::Get, '/2')->parameters);
+        }
+    }
+
+    #[Test]
+    public function it_generates_a_url_that_leaves_out_a_missing_optional_parameter(): void
+    {
+        $router = new Router();
+        $router->get('/posts/{page?}', 'posts.index')->name('posts.index');
+        $router->get('/{page?}', 'home')->name('home');
+
+        self::assertSame('/posts', $router->url('posts.index'));
+        self::assertSame('/posts/2', $router->url('posts.index', ['page' => 2]));
+        self::assertSame('/', $router->url('home'));
+    }
 }

@@ -228,4 +228,36 @@ final class RouteTest extends TestCase
 
         $route->generatePath(['id' => '']);
     }
+
+    #[Test]
+    public function it_generates_a_path_without_its_optional_parameter(): void
+    {
+        $route = new Route(HttpMethod::Get, '/users/{user}/posts/{page?}', 'handler');
+
+        self::assertSame('/users/jane/posts', $route->generatePath(['user' => 'jane']));
+        self::assertSame('/users/jane/posts/2', $route->generatePath(['user' => 'jane', 'page' => 2]));
+    }
+
+    #[Test]
+    public function it_still_requires_the_other_parameters_of_a_route_with_an_optional_one(): void
+    {
+        $route = new Route(HttpMethod::Get, '/users/{user}/posts/{page?}', 'handler');
+
+        $this->expectException(InvalidUrlParameterException::class);
+        $this->expectExceptionMessageIs(
+            'Cannot generate a URL for the route "/users/{user}/posts/{page?}": the parameter "user" is missing.',
+        );
+
+        $route->generatePath(['page' => 2]);
+    }
+
+    #[Test]
+    public function it_checks_a_given_optional_parameter_against_its_constraint(): void
+    {
+        $route = new Route(HttpMethod::Get, '/posts/{page?}', 'handler')->where('page', RoutePattern::Integer);
+
+        $this->expectException(InvalidUrlParameterException::class);
+
+        $route->generatePath(['page' => 'last']);
+    }
 }

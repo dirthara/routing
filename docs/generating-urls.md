@@ -25,8 +25,17 @@ A value is a string, an integer, a float, a boolean, or a `Stringable`. `true` b
 Each value is percent-encoded, so it always stays within its own segment: `'annual report/2026.pdf'` becomes
 `annual%20report%2F2026.pdf`, which matches the route and decodes back to the original value.
 
-Every parameter of the route has to be given, and nothing else. There is no query string support; append one to the
-result if you need it.
+Every parameter of the route has to be given, except an [optional parameter](defining-routes.md#optional-parameters),
+and nothing else. Leaving out the optional parameter leaves out its segment and the slash before it:
+
+```php
+$router->get('/posts/{page?}', ListPosts::class)->name('posts.index');
+
+$router->url('posts.index');                  // '/posts'
+$router->url('posts.index', ['page' => 2]);   // '/posts/2'
+```
+
+There is no query string support; append one to the result if you need it.
 
 ```php
 $path = $router->url('users.index') . '?' . http_build_query(['page' => 2]);
@@ -41,7 +50,7 @@ parameter's constraint, or against the default of one or more characters when it
 | --- | --- |
 | No route has the name. | `RouteNotFoundException` |
 | More than one route has the name. | `InvalidRouteException` |
-| A parameter of the route is not given. | `InvalidUrlParameterException` |
+| A required parameter of the route is not given. | `InvalidUrlParameterException` |
 | A given parameter is not in the route's path. | `InvalidUrlParameterException` |
 | A value does not match its constraint, or is empty. | `InvalidUrlParameterException` |
 

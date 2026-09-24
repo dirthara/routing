@@ -68,6 +68,19 @@ final class InvalidRouteException extends InvalidArgumentException implements Ro
         );
     }
 
+    public static function misplacedOptionalParameter(string $path, string $parameter): self
+    {
+        return new self(
+            message: sprintf(
+                'The optional parameter "%2$s" of the route path "%1$s" must be the whole last segment of the path, as '
+                . 'in "/posts/{page?}".',
+                self::printable($path),
+                $parameter,
+            ),
+            context: ['path' => $path, 'parameter' => $parameter],
+        );
+    }
+
     public static function unknownParameter(string $path, string $parameter): self
     {
         return new self(

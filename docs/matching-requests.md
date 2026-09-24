@@ -26,7 +26,8 @@ Routes are tried in the order they were registered, and the first route whose me
 specific route before a general one that would also match it.
 
 Parameter values are percent-decoded, so `/files/annual%20report.pdf` gives `['name' => 'annual report.pdf']`. A `+`
-stays a `+`; it only means a space in a query string, not in a path.
+stays a `+`; it only means a space in a query string, not in a path. An
+[optional parameter](defining-routes.md#optional-parameters) whose segment is missing is not in `parameters` at all.
 
 ## When nothing matches
 
@@ -80,3 +81,6 @@ $router = new Router(trailingSlash: TrailingSlash::Strict);
 `Ignore` is the default because a trailing slash is rarely meaningful to a user and is easy to add by accident. With
 `Strict`, `/users/` gives a `RouteNotFoundException` when only `/users` is registered. The root path `/` matches only
 `/` or an empty path under either option.
+
+A route ending in an optional parameter, such as `/posts/{page?}`, matches `/posts` and `/posts/2` under either option;
+only `Ignore` also matches `/posts/` and `/posts/2/`.

@@ -138,6 +138,10 @@ final class Route
 
         foreach ($patterns as $parameter => $pattern) {
             if (!array_key_exists($parameter, $parameters)) {
+                if ($parameter === $this->routePath->optionalParameter) {
+                    continue;
+                }
+
                 throw InvalidUrlParameterException::missingParameter($this->name, $this->path, $parameter);
             }
 

@@ -70,4 +70,17 @@ final class InvalidRouteExceptionTest extends TestCase
             $exception->getMessage(),
         );
     }
+
+    #[Test]
+    public function it_describes_a_misplaced_optional_parameter(): void
+    {
+        $exception = InvalidRouteException::misplacedOptionalParameter("/{lang?}/about\n", 'lang');
+
+        self::assertSame(
+            'The optional parameter "lang" of the route path "/{lang?}/about\\n" must be the whole last segment of '
+            . 'the path, as in "/posts/{page?}".',
+            $exception->getMessage(),
+        );
+        self::assertSame(['path' => "/{lang?}/about\n", 'parameter' => 'lang'], $exception->context);
+    }
 }

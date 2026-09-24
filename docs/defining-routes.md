@@ -49,6 +49,29 @@ Without a constraint, a parameter matches one path segment: one or more characte
 `/files/{name}.{format}`, that means `{name}` can also swallow dots; constrain it if the split matters.
 :::
 
+## Optional parameters
+
+A parameter with a `?` after its name, such as `{page?}`, is optional: the route matches with or without it.
+
+```php
+$router->get('/posts/{page?}', ListPosts::class)->where('page', RoutePattern::Integer);
+```
+
+That route matches `/posts` and `/posts/2`. When the segment is missing, the parameter is left out of
+`RouteMatch::$parameters` rather than set to a default, so check for it:
+
+```php
+$page = (int) ($match->parameters['page'] ?? 1);
+```
+
+An optional parameter has to be the whole last segment of the path, which makes it the only optional parameter the
+path can have. `/{lang?}/about`, `/posts/{page?}.json`, `/posts/page{page?}`, and `/posts/{page?}/` throw an
+`InvalidRouteException`, because with the segment missing it would be ambiguous what the rest of the path should look
+like. Register a second route for those cases instead.
+
+`/{page?}` is allowed and matches `/` as well as `/2`. A constraint on an optional parameter applies when the segment is
+there; `/posts/last` does not match the route above.
+
 ## Constraining parameters
 
 `where()` restricts what a parameter matches with a regular expression. A route whose parameter does not match is

@@ -42,6 +42,34 @@ final class RoutePathTest extends TestCase
             self::invalidNameMessage('/{a234567890123456789012345678901234}', 'a234567890123456789012345678901234'),
         ];
         yield 'duplicate' => ['/{id}/{id}', 'The route path "/{id}/{id}" uses the parameter "id" more than once.'];
+        yield 'duplicate optional' => [
+            '/{id}/{id?}',
+            'The route path "/{id}/{id?}" uses the parameter "id" more than once.',
+        ];
+        yield 'invalid optional name' => ['/posts/{1?}', self::invalidNameMessage('/posts/{1?}', '1')];
+        yield 'bare question mark' => ['/posts/{?}', self::invalidNameMessage('/posts/{?}', '')];
+        yield 'optional before a segment' => ['/{lang?}/about', self::misplacedMessage('/{lang?}/about', 'lang')];
+        yield 'optional before a parameter' => ['/{a?}/{b}', self::misplacedMessage('/{a?}/{b}', 'a')];
+        yield 'optional with a suffix' => [
+            '/posts/{page?}.json',
+            self::misplacedMessage('/posts/{page?}.json', 'page'),
+        ];
+        yield 'optional with a prefix' => ['/posts/page{page?}', self::misplacedMessage('/posts/page{page?}', 'page')];
+        yield 'optional after a parameter' => ['/{a}{b?}', self::misplacedMessage('/{a}{b?}', 'b')];
+        yield 'optional with a trailing slash' => [
+            '/posts/{page?}/',
+            self::misplacedMessage('/posts/{page?}/', 'page'),
+        ];
+    }
+
+    private static function misplacedMessage(string $path, string $parameter): string
+    {
+        return sprintf(
+            'The optional parameter "%s" of the route path "%s" must be the whole last segment of the path, as in '
+            . '"/posts/{page?}".',
+            $parameter,
+            $path,
+        );
     }
 
     private static function invalidNameMessage(string $path, string $parameter): string
@@ -122,5 +150,67 @@ final class RoutePathTest extends TestCase
         $path = new RoutePath('/users/{id}/{slug}');
 
         self::assertSame('/users/1/a%20b', $path->build(['id' => '1', 'slug' => 'a%20b']));
+    }
+
+    #[Test]
+    public function it_knows_its_optional_parameter(): void
+    {
+        $path = new RoutePath('/users/{user}/posts/{page?}');
+
+        self::assertSame('page', $path->optionalParameter);
+        self::assertSame(['user', 'page'], $path->parameters());
+        self::assertNull(new RoutePath('/users/{user}')->optionalParameter);
+    }
+
+    #[Test]
+    public function it_makes_the_last_segment_optional_in_its_regex(): void
+    {
+        $path = new RoutePath('/posts/{page?}');
+        $patterns = ['page' => '\d+'];
+
+        self::assertSame('~^/posts(?:/(?P<page>\d+))?$~D', $path->regex($patterns, TrailingSlash::Strict));
+        self::assertSame('~^/posts(?:/(?P<page>\d+))?/?$~D', $path->regex($patterns, TrailingSlash::Ignore));
+    }
+
+    #[Test]
+    public function it_keeps_the_root_slash_in_the_regex_of_an_optional_root_parameter(): void
+    {
+        $path = new RoutePath('/{page?}');
+        $patterns = ['page' => '\d+'];
+
+        self::assertSame('~^/(?P<page>\d+)?$~D', $path->regex($patterns, TrailingSlash::Strict));
+        self::assertSame('~^(?:/(?P<page>\d+))?/?$~D', $path->regex($patterns, TrailingSlash::Ignore));
+    }
+
+    #[Test]
+    public function it_leaves_a_missing_optional_parameter_out_of_a_match(): void
+    {
+        $path = new RoutePath('/users/{user}/posts/{page?}');
+        $patterns = ['user' => '[^/]+', 'page' => '[^/]+'];
+
+        self::assertSame(['user' => 'jane'], $path->match('/users/jane/posts', $patterns, TrailingSlash::Strict));
+        self::assertSame(
+            ['user' => 'jane', 'page' => '2'],
+            $path->match('/users/jane/posts/2', $patterns, TrailingSlash::Strict),
+        );
+    }
+
+    #[Test]
+    public function it_keeps_an_optional_parameter_that_matched_empty(): void
+    {
+        $path = new RoutePath('/posts/{page?}');
+
+        self::assertSame(['page' => ''], $path->match('/posts/', ['page' => '\d*'], TrailingSlash::Strict));
+    }
+
+    #[Test]
+    public function it_builds_a_path_with_or_without_its_optional_parameter(): void
+    {
+        $path = new RoutePath('/users/{user}/posts/{page?}');
+
+        self::assertSame('/users/jane/posts/2', $path->build(['user' => 'jane', 'page' => '2']));
+        self::assertSame('/users/jane/posts', $path->build(['user' => 'jane']));
+        self::assertSame('/', new RoutePath('/{page?}')->build([]));
+        self::assertSame('/3', new RoutePath('/{page?}')->build(['page' => '3']));
     }
 }
