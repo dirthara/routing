@@ -38,7 +38,7 @@ and `match()` hands it back with the parameters so your application can dispatch
 | `Route` | One method, path, and handler, with an optional name and parameter constraints. |
 | `RouteMatch` | The result of a successful match: the route and its decoded parameters. |
 | `UrlGenerator` | Builds the path of a route from its name or its action. |
-| `RouteCollection` | The routes in the order they were registered. |
+| `RouteCollection` | The router's storage for its routes, in registration order. `Router` does not expose it, so you only need it to construct a `UrlGenerator` yourself. |
 | `HttpMethod` | The methods a route can be registered for. |
 | `RoutePattern` | Ready-made constraints such as integers, UUIDs, ULIDs, slugs, and dates. |
 | `TrailingSlash` | Whether a trailing slash in the path matters when matching. |

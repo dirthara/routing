@@ -149,3 +149,34 @@ An enum case and a string are different names, even when the string reads like t
 route named `Page::Home`. An empty string throws an `InvalidRouteException`. Giving two routes the same name is not
 rejected when the name is set, because a route can be named after it has been added; it is rejected when the name is
 used to generate a URL.
+
+## Reading a route back
+
+A `Route`, such as the one `$match->route` holds, describes itself:
+
+| Member | Returns |
+| --- | --- |
+| `$route->method` | The `HttpMethod` it was registered for. |
+| `$route->path` | The path as it was registered, such as `/users/{id}`. |
+| `$route->name` | The name given with `name()`, or `null` when it has none. |
+| `handler()` | The handler it was registered with. |
+| `parameters()` | The parameter names in the order they appear in the path, including an optional one, without the `?`. |
+| `constraints()` | The constraints set with `where()` and `whereMany()`, keyed by parameter name. |
+
+`matches()` tests a path against this one route and returns its decoded parameters, or `null` when it does not match.
+It does not look at the method, and it takes the [trailing slash](matching-requests.md#trailing-slashes) option as its
+second argument, defaulting to `TrailingSlash::Ignore` like the router.
+
+```php
+use Dirthara\Routing\RoutePattern;
+use Dirthara\Routing\TrailingSlash;
+
+$route = $router->get('/users/{id}', ShowUser::class)->where('id', RoutePattern::PositiveInteger);
+
+$route->parameters();                                   // ['id']
+$route->matches('/users/7');                            // ['id' => '7']
+$route->matches('/users/7/', TrailingSlash::Strict);    // null
+```
+
+`generatePath()` builds this route's path from its parameters, following the same rules as
+[generating a URL](generating-urls.md#parameter-values).

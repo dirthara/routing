@@ -50,4 +50,10 @@ try {
 Control characters in a path, name, or pattern are escaped in the message, so a request path cannot forge extra lines
 in a log. The context keeps the original values.
 
-The package never logs, and never includes a URL parameter's value in a message or in context.
+The package never logs. When generating a URL, it never includes a parameter's value in a message or in context.
+
+:::caution
+A path that does not match is different: `RouteNotFoundException` and `MethodNotAllowedException` include the request
+path in their message and in `context`, and that path contains every parameter value in it. If your paths can carry
+tokens, such as a password reset link, redact the path before you log these exceptions.
+:::
