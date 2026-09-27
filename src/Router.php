@@ -6,6 +6,8 @@ namespace Dirthara\Routing;
 
 use UnitEnum;
 use Stringable;
+use Dirthara\Routing\Contract\RouteMatcher;
+use Dirthara\Routing\Contract\RouteRegistrar;
 use Dirthara\Routing\Exception\InvalidRouteException;
 use Dirthara\Routing\Exception\RouteNotFoundException;
 use Dirthara\Routing\Exception\MethodNotAllowedException;
@@ -13,7 +15,7 @@ use Dirthara\Routing\Exception\InvalidUrlParameterException;
 
 use function array_values;
 
-final readonly class Router
+final readonly class Router implements RouteRegistrar, RouteMatcher
 {
     private RouteCollection $routes;
 

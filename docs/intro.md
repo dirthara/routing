@@ -43,6 +43,42 @@ and `match()` hands it back with the parameters so your application can dispatch
 | `RoutePattern` | Ready-made constraints for integers, UUIDs, and slugs. |
 | `TrailingSlash` | Whether a trailing slash in the path matters when matching. |
 
+## Depend on the interfaces
+
+The classes implement one interface for each part of the work, in the `Dirthara\Routing\Contract` namespace:
+
+| Interface | Implemented by | Methods | Use it for |
+| --- | --- | --- | --- |
+| `Contract\RouteRegistrar` | `Router` | `add()`, `get()`, `head()`, `post()`, `put()`, `patch()`, `delete()`, `options()` | [Registering routes](defining-routes.md). |
+| `Contract\RouteMatcher` | `Router` | `match()` | [Matching a request](matching-requests.md) to a route. |
+| `Contract\UrlGenerator` | `UrlGenerator` | `name()`, `action()` | [Generating a path](generating-urls.md) by name or action. |
+| `Contract\Route` | `Route` | `name()`, `where()`, `whereMany()`, `handler()`, `constraints()`, `parameters()`, `matches()`, `generatePath()`, and the `method`, `path`, and `name` properties | Naming and constraining a route, and reading it back. |
+
+Type against the interface that matches what the code does, rather than against the class:
+
+```php
+use Dirthara\Routing\RoutePattern;
+use Dirthara\Routing\Contract\RouteRegistrar;
+
+final readonly class UserRoutes
+{
+    public function register(RouteRegistrar $routes): void
+    {
+        $routes->get('/users', ListUsers::class)->name('users.index');
+        $routes->get('/users/{id}', ShowUser::class)->name('users.show')->where('id', RoutePattern::PositiveInteger);
+    }
+}
+```
+
+The registrar returns a `Contract\Route`, and `RouteMatch::$route` is typed as one too, so neither registering nor
+matching reaches a concrete class. `$router->urls()` returns the router's `UrlGenerator`; bind `Contract\UrlGenerator`
+to it in your container so link-building code can ask for the interface.
+
+:::note
+None of the interfaces extends another. Code that both registers and matches routes asks for both, or for `Router`.
+`RouteMatch` and the enums are values, and `RouteCollection` is the router's storage; none of them has an interface.
+:::
+
 Read how to [define routes](defining-routes.md), how the router
 [matches requests](matching-requests.md), how to [generate URLs](generating-urls.md), and which exceptions it throws in
 [error handling](error-handling.md). See [installation](installation.md) for requirements and development setup.

@@ -9,15 +9,20 @@ use Dirthara\Routing\Route;
 use Dirthara\Routing\Router;
 use PHPUnit\Framework\TestCase;
 use Dirthara\Routing\HttpMethod;
+use Dirthara\Routing\RouteMatch;
 use Dirthara\Routing\RoutePattern;
 use Dirthara\Routing\TrailingSlash;
 use PHPUnit\Framework\Attributes\Test;
+use Dirthara\Routing\Contract\RouteMatcher;
+use Dirthara\Routing\Contract\RouteRegistrar;
 use Dirthara\Routing\Tests\Fixtures\RouteName;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Dirthara\Routing\Contract\Route as RouteContract;
 use Dirthara\Routing\Exception\InvalidRouteException;
 use Dirthara\Routing\Exception\RouteNotFoundException;
 use Dirthara\Routing\Exception\MethodNotAllowedException;
 use Dirthara\Routing\Exception\InvalidUrlParameterException;
+use Dirthara\Routing\Contract\UrlGenerator as UrlGeneratorContract;
 
 final class RouterTest extends TestCase
 {
@@ -412,5 +417,43 @@ final class RouterTest extends TestCase
         $router->get('/users', 'ListUsers');
 
         self::assertSame('/users', $urls->action('ListUsers'));
+    }
+
+    #[Test]
+    public function it_implements_the_registrar_and_matcher_contracts(): void
+    {
+        $router = new Router();
+
+        self::assertInstanceOf(RouteRegistrar::class, $router);
+        self::assertInstanceOf(RouteMatcher::class, $router);
+        self::assertInstanceOf(UrlGeneratorContract::class, $router->urls());
+    }
+
+    #[Test]
+    public function it_registers_matches_and_generates_through_its_contracts(): void
+    {
+        $router = new Router();
+        $this->registerThroughContract($router);
+
+        $match = $this->matchThroughContract($router, '/users/7');
+
+        self::assertInstanceOf(RouteContract::class, $match->route);
+        self::assertSame(['id' => '7'], $match->parameters);
+        self::assertSame('/users/7', $this->generateThroughContract($router->urls()));
+    }
+
+    private function registerThroughContract(RouteRegistrar $registrar): void
+    {
+        $registrar->get('/users/{id}', 'ShowUser')->name('users.show')->where('id', RoutePattern::PositiveInteger);
+    }
+
+    private function matchThroughContract(RouteMatcher $matcher, string $path): RouteMatch
+    {
+        return $matcher->match(HttpMethod::Get, $path);
+    }
+
+    private function generateThroughContract(UrlGeneratorContract $urls): string
+    {
+        return $urls->name('users.show', ['id' => 7]);
     }
 }

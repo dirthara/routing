@@ -16,6 +16,7 @@ use Dirthara\Routing\Tests\Fixtures\UserController;
 use Dirthara\Routing\Exception\InvalidRouteException;
 use Dirthara\Routing\Exception\RouteNotFoundException;
 use Dirthara\Routing\Exception\InvalidUrlParameterException;
+use Dirthara\Routing\Contract\UrlGenerator as UrlGeneratorContract;
 
 final class UrlGeneratorTest extends TestCase
 {
@@ -176,5 +177,11 @@ final class UrlGeneratorTest extends TestCase
 
         self::assertSame('/posts', $urls->action('ListPosts'));
         self::assertSame('/posts/2', $urls->action('ListPosts', ['page' => 2]));
+    }
+
+    #[Test]
+    public function it_implements_the_url_generator_contract(): void
+    {
+        self::assertInstanceOf(UrlGeneratorContract::class, new UrlGenerator(new RouteCollection()));
     }
 }

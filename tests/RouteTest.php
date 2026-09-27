@@ -12,6 +12,7 @@ use Dirthara\Routing\RoutePattern;
 use Dirthara\Routing\TrailingSlash;
 use PHPUnit\Framework\Attributes\Test;
 use Dirthara\Routing\Tests\Fixtures\RouteName;
+use Dirthara\Routing\Contract\Route as RouteContract;
 use Dirthara\Routing\Exception\InvalidRouteException;
 use Dirthara\Routing\Exception\InvalidUrlParameterException;
 
@@ -296,5 +297,21 @@ final class RouteTest extends TestCase
         foreach (RoutePattern::cases() as $pattern) {
             self::assertSame(['value' => $pattern->value], $route->where('value', $pattern)->constraints());
         }
+    }
+
+    #[Test]
+    public function it_implements_the_route_contract(): void
+    {
+        $route = new Route(HttpMethod::Get, '/users/{id}', 'handler');
+
+        self::assertInstanceOf(RouteContract::class, $route);
+        self::assertSame($route, $this->configureThroughContract($route));
+        self::assertSame('users.show', $route->name);
+        self::assertSame(['id' => RoutePattern::PositiveInteger->value], $route->constraints());
+    }
+
+    private function configureThroughContract(RouteContract $route): RouteContract
+    {
+        return $route->name('users.show')->whereMany(['id' => RoutePattern::PositiveInteger]);
     }
 }

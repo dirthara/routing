@@ -9,8 +9,9 @@ use Stringable;
 use Dirthara\Routing\Exception\InvalidRouteException;
 use Dirthara\Routing\Exception\RouteNotFoundException;
 use Dirthara\Routing\Exception\InvalidUrlParameterException;
+use Dirthara\Routing\Contract\UrlGenerator as UrlGeneratorContract;
 
-final readonly class UrlGenerator
+final readonly class UrlGenerator implements UrlGeneratorContract
 {
     public function __construct(
         private RouteCollection $routes,

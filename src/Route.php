@@ -6,6 +6,7 @@ namespace Dirthara\Routing;
 
 use UnitEnum;
 use Stringable;
+use Dirthara\Routing\Contract\Route as RouteContract;
 use Dirthara\Routing\Exception\InvalidRouteException;
 use Dirthara\Routing\Exception\InvalidUrlParameterException;
 
@@ -19,7 +20,7 @@ use function array_key_exists;
 use function set_error_handler;
 use function restore_error_handler;
 
-final class Route
+final class Route implements RouteContract
 {
     public private(set) string|UnitEnum|null $name = null;
 
