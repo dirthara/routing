@@ -2,10 +2,9 @@
 
 ## Supported versions
 
-| Version | Status |
-| --- | --- |
-| 0.1.x | Active development; unreleased |
-| Older | Unsupported |
+| Branch | Releases | Status |
+| --- | --- | --- |
+| `0.1` | 0.1.x | Active |
 
 While the package is pre-1.0, only the latest release line receives fixes.
 
@@ -22,11 +21,22 @@ advisory crediting the reporter unless they prefer otherwise.
 
 ## Scope
 
-This repository currently contains package infrastructure and no public
-implementation. Report security issues in this package's code or development
-configuration. As the package's behaviour is introduced, update this policy
-with its security boundaries.
+The router treats the request method and path passed to `match()` as untrusted.
+In scope are flaws in how the package handles them, for example:
+
+- a path that matches a route it should not, or that escapes a parameter's
+  constraint or its own segment;
+- a parameter value that is decoded differently from how it was matched;
+- a generated path that does not match its own route, or in which a parameter
+  value breaks out of its segment;
+- a built-in `RoutePattern` that accepts input its documentation excludes, or
+  that backtracks catastrophically on crafted input.
+
+Route definitions are trusted. Paths, handlers, names, and custom constraint
+patterns come from the application, so a slow or permissive pattern the
+application supplies is not a vulnerability in this package. Neither is what a
+handler does with a matched parameter: the router checks a value against its
+constraint and decodes it, but validating, authorizing, and escaping it for
+its eventual use are the application's responsibility.
 
 Bugs in PHP or third-party dependencies should also be reported upstream.
-Application code and the sensitivity of data an application chooses to store
-are the application's responsibility.

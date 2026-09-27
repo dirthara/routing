@@ -40,7 +40,7 @@ and `match()` hands it back with the parameters so your application can dispatch
 | `UrlGenerator` | Builds the path of a route from its name or its action. |
 | `RouteCollection` | The routes in the order they were registered. |
 | `HttpMethod` | The methods a route can be registered for. |
-| `RoutePattern` | Ready-made constraints for integers, UUIDs, and slugs. |
+| `RoutePattern` | Ready-made constraints such as integers, UUIDs, ULIDs, slugs, and dates. |
 | `TrailingSlash` | Whether a trailing slash in the path matters when matching. |
 
 ## Depend on the interfaces

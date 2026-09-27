@@ -27,7 +27,11 @@ after what it does:
 | --- | --- |
 | `feature/<issue>-short-slug` | A new feature. |
 | `bugfix/<issue>-short-slug` | A fix for a reported bug. |
-| `hotfix/<short-slug>` | An urgent fix that ships as a patch release immediately. |
+| `hotfix/<issue>-short-slug` | An urgent fix that ships as a patch release immediately. |
+| `task/<issue>-short-slug` | Work that is neither a feature nor a fix, such as tooling or documentation. |
+
+Open an issue first when there is none, and put its number in every commit
+message. Keep commit messages to a single line of at most 120 characters.
 
 What you target depends on what you are doing:
 
@@ -94,7 +98,7 @@ git push origin 0.1.3
 
 A release is gated on a perfect [Plumb](https://plumbphp.dev) score. Every
 package scores 100 before it is tagged; the packaging rules that get it there
-are in [agents/packaging.md](agents/packaging.md).
+are in [CS-8: Packaging](https://github.com/dirthara/coding-standards/blob/main/docs/coding-standards/cs-8-packaging.md).
 
 ```sh
 curl -X POST https://plumbphp.dev/api/v1/packages/dirthara/routing
@@ -125,8 +129,6 @@ Then update the supported versions table below and in
 | --- | --- | --- |
 | `0.1` | 8.5 | Active |
 
-The initial `0.1` scaffold is unreleased.
-
 ## Before you open a pull request
 
 Run everything CI runs:
@@ -136,20 +138,20 @@ docker compose exec php composer ci
 ```
 
 That is Mago's formatter, linter, analyzer, and architecture rules, then the
-test suite with coverage, then the coverage gate. Start the PHP container with `docker compose up -d php`. CI uses the same
-image. The empty scaffold skips tests and coverage until PHP files exist in
-`src` or `tests`. The individual commands are in [README.md](README.md).
+test suite with coverage, then the coverage gate. Start the PHP container with
+`docker compose up -d php`. CI uses the same image. The individual commands are
+in [README.md](README.md).
 
 Your pull request needs:
 
 - **Every check green.** A single `CI` check reports the result of Mago and of
   the test suite on every supported PHP version.
 - **Full coverage of `src`.** The gate fails the build below 100% line coverage
-  and prints the uncovered lines. Cover new code with tests in the pull request that adds it.
-
+  and prints the uncovered lines. Cover new code with tests in the pull request
+  that adds it.
 - **Documentation that matches.** Behaviour that the [docs](docs) describe is
   updated in the same pull request. See the conventions in
-  [agents/documentation.md](agents/documentation.md).
+  [CS-6: Documentation](https://github.com/dirthara/coding-standards/blob/main/docs/coding-standards/cs-6-documentation.md).
 
 ## Maintainers: protecting a release branch
 

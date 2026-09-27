@@ -4,9 +4,9 @@
 
 # Dirthara Routing
 
-Routing for the Dirthara Framework: match an HTTP method and path to a handler, and generate paths for named routes. No 
-release is available yet. Usage documentation lives in [`docs`](docs/intro.md) and is published on the Dirthara 
-documentation site at <https://dirthara.github.io/docs/>, which documents every package in the framework.
+Routing for the Dirthara Framework: match an HTTP method and path to a handler, and generate paths for named routes. Usage 
+documentation lives in [`docs`](docs/intro.md) and is published on the Dirthara documentation site at 
+<https://dirthara.github.io/docs/>, which documents every package in the framework.
 
 ## Installation
 
@@ -45,7 +45,7 @@ docker compose down
 docker compose exec php composer test
 ```
 
-Tests belong in `tests`, under `Dirthara\Routing\Tests`. Source belongs in`src`, under `Dirthara\Routing`.
+Tests belong in `tests`, under `Dirthara\Routing\Tests`. Source belongs in `src`, under `Dirthara\Routing`.
 
 ## Code quality
 
